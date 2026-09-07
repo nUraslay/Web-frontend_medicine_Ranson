@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Оценка тяжести панкреатита по Рэнсону</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/ranson_styles.css">
+</head>
+<body>
+
+<div class="mobile-container">
+
+    {{ if .Error }}
+    <div id="feed-page" class="page active">
+        <div class="feed-overlay">
+            <div class="feed-info">
+                <div class="feed-title">{{ .Error }}</div>
+            </div>
+        </div>
+    </div>
+    {{ else }}
+    <div id="feed-page" class="page active" style="background-image: url('{{ .Service.ImageURL }}');">
+        <video class="feed-video-bg" src="{{ .Service.VideoURL }}" autoplay muted loop playsinline></video>
+        <div class="feed-overlay">
+            <div class="feed-info">
+                <div class="feed-title" id="feed-title-text">{{ .Service.Title }}</div>
+                <div class="feed-desc-container">
+                    <span class="feed-desc-text" id="feed-desc">{{ .Service.Description }}</span>
+                    <button class="feed-more-btn">еще</button>
+                </div>
+            </div>
+
+            <div class="feed-right-actions">
+                <div class="action-btn like-btn">
+                    <i class="fa-solid fa-heart"></i>
+                    <span id="feed-likes">{{ .Service.LikesCount }}</span>
+                </div>
+                <a href="/feed/{{ .Service.ID }}?next=true" class="action-btn" style="text-decoration: none; color: white;">
+                    <i class="fa-solid fa-circle-arrow-right"></i>
+                    <span>След.</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+
+    <div class="bottom-nav">
+        <a href="/feed" class="nav-item active" style="text-decoration: none;">
+            <i class="fa-solid fa-house"></i>
+            <span>Лента</span>
+        </a>
+        <a href="/add" class="nav-item" style="text-decoration: none;">
+            <i class="fa-regular fa-square-plus"></i>
+            <span>Добавить</span>
+        </a>
+        <a href="/grid" class="nav-item" style="text-decoration: none;">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Плитка</span>
+        </a>
+    </div>
+
+</div>
+</body>
+</html>

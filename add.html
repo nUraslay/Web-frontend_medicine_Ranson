@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Оценка тяжести панкреатита по Рэнсону</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/ranson_styles.css">
+</head>
+<body>
+
+<div class="mobile-container">
+
+    <div id="add-page" class="page active">
+        <h2 class="page-title">Новая карточка</h2>
+
+        {{ if .Error }}
+        <p>{{ .Error }}</p>
+        {{ else }}
+
+        <div class="form-group">
+            <label class="form-label">Медиафайл (Фото/Видео)</label>
+            <div class="media-upload-row">
+                <div class="upload-area">
+                    <i class="fa-solid fa-image"></i>
+                    <div>Загрузить</div>
+                </div>
+                <div class="upload-area">
+                    <i class="fa-solid fa-camera"></i>
+                    <div>Загрузить</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Тема / Критерий</label>
+            <input type="text" class="form-input" value="{{ .Draft.Title }}">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Описание критерия</label>
+            <textarea class="form-textarea">{{ .Draft.Description }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Категория</label>
+            <input type="text" class="form-input" value="{{ .Draft.Category }}">
+        </div>
+
+        <button class="submit-btn">Готово</button>
+        {{ end }}
+    </div>
+
+    <div class="bottom-nav">
+        <a href="/feed" class="nav-item" style="text-decoration: none;">
+            <i class="fa-solid fa-house"></i>
+            <span>Лента</span>
+        </a>
+        <a href="/add" class="nav-item active" style="text-decoration: none;">
+            <i class="fa-regular fa-square-plus"></i>
+            <span>Добавить</span>
+        </a>
+        <a href="/grid" class="nav-item" style="text-decoration: none;">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Плитка</span>
+        </a>
+    </div>
+
+</div>
+</body>
+</html>

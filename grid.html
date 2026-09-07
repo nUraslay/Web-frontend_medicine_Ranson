@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Оценка тяжести панкреатита по Рэнсону</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/ranson_styles.css">
+</head>
+<body>
+
+<div class="mobile-container">
+
+    <div id="grid-page" class="page active">
+        <div class="grid-header">
+            <h2 class="page-title">Все карточки</h2>
+        </div>
+
+        <form action="/grid" method="GET">
+            <input type="text" name="filter" class="search-bar" placeholder="Название критерия" value="{{ .Filter }}">
+        </form>
+
+        <div class="grid-container">
+            {{ range .Services }}
+            <a href="/feed/{{ .ID }}" class="card" style="text-decoration: none; color: inherit;">
+                <img src="{{ .ImageURL }}" alt="{{ .Title }}" class="card-img">
+                <div class="card-content">
+                    <div class="card-title">{{ .Title }}</div>
+                    <div class="card-tag">{{ .Category }}</div>
+                    <div class="card-footer">
+                        <i class="fa-solid fa-heart"></i> {{ .LikesCount }}
+                    </div>
+                </div>
+            </a>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="/feed" class="nav-item" style="text-decoration: none;">
+            <i class="fa-solid fa-house"></i>
+            <span>Лента</span>
+        </a>
+        <a href="/add" class="nav-item" style="text-decoration: none;">
+            <i class="fa-regular fa-square-plus"></i>
+            <span>Добавить</span>
+        </a>
+        <a href="/grid" class="nav-item active" style="text-decoration: none;">
+            <i class="fa-solid fa-border-all"></i>
+            <span>Плитка</span>
+        </a>
+    </div>
+
+</div>
+</body>
+</html>
