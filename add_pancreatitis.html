@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Оценка тяжести панкреатита по Рэнсону</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/ranson_styles.css">
+    <link rel="stylesheet" href="/static/pancreatitis_styles.css">
 </head>
 <body>
 
@@ -46,21 +46,19 @@
             <label class="form-label">Категория</label>
             <input type="text" class="form-input" value="{{ .Draft.Category }}">
         </div>
-
-        <button class="submit-btn">Готово</button>
         {{ end }}
     </div>
 
     <div class="bottom-nav">
-        <a href="/feed" class="nav-item" style="text-decoration: none;">
+        <a href="/pancreatitis-signs/feed" class="nav-item" style="text-decoration: none;">
             <i class="fa-solid fa-house"></i>
             <span>Лента</span>
         </a>
-        <a href="/add" class="nav-item active" style="text-decoration: none;">
+        <a href="/pancreatitis-signs/add" class="nav-item active" style="text-decoration: none;">
             <i class="fa-regular fa-square-plus"></i>
             <span>Добавить</span>
         </a>
-        <a href="/grid" class="nav-item" style="text-decoration: none;">
+        <a href="/pancreatitis-signs/grid" class="nav-item" style="text-decoration: none;">
             <i class="fa-solid fa-border-all"></i>
             <span>Плитка</span>
         </a>
