@@ -25,16 +25,27 @@
 
         <div class="grid-container">
             {{ range .Signs }}
-            <a href="/pancreatitis-signs/feed/{{ .ID }}" class="card" style="text-decoration: none; color: inherit;">
-                <img src="{{ .ImageURL }}" alt="{{ .Title }}" class="card-img">
-                <div class="card-content">
-                    <div class="card-title">{{ .Title }}</div>
-                    <div class="card-tag">{{ .Category }}</div>
-                    <div class="card-footer">
-                        <i class="fa-solid fa-heart"></i> {{ .LikesCount }}
+            <div class="card">
+                <a href="/pancreatitis-signs/feed/{{ .ID }}" class="card-link" style="text-decoration: none; color: inherit;">
+                    <img src="{{ .ImageURL }}" alt="{{ .Title }}" class="card-img"
+                         onerror="this.onerror=null; this.src='/static/img/default_pancreatitis_sign.jpg';">
+                    <div class="card-content">
+                        <div class="card-title">{{ .Title }}</div>
+                        <div class="card-tag">{{ .Stage }}</div>
+                        <div class="card-footer">
+                            <i class="fa-solid fa-heart"></i> {{ .LikesCount }}
+                        </div>
                     </div>
-                </div>
-            </a>
+                </a>
+                <form action="/pancreatitis-signs/delete" method="POST" class="card-delete-form">
+                    <input type="hidden" name="sign_id" value="{{ .ID }}">
+                    <button type="submit" class="card-delete-btn" aria-label="Удалить">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </form>
+            </div>
+            {{ else }}
+            <p class="grid-empty">Ничего не найдено</p>
             {{ end }}
         </div>
     </div>
