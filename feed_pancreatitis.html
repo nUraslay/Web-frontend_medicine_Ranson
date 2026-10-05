@@ -6,6 +6,44 @@
     <title>Оценка тяжести панкреатита по Рэнсону</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/pancreatitis_styles.css">
+    <style>
+        /* параметры признака под кнопкой «следующий»: порог и этап оценки */
+        .feed-params {
+            position: absolute;
+            top: 100%;
+            right: -8px;
+            margin-top: 14px;
+            width: 72px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-shadow: none;
+        }
+
+        .feed-param {
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+        }
+
+        .feed-param-threshold {
+            padding: 6px 4px;
+            background-color: var(--white);
+            color: var(--text-dark);
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .feed-param-stage {
+            padding: 7px 4px;
+            background-color: var(--white);
+            color: var(--text-dark);
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+    </style>
 </head>
 <body>
 
@@ -40,6 +78,13 @@
                 <a href="/pancreatitis-signs/feed/{{ .Sign.ID }}?next=true" class="feed-next-btn" aria-label="Следующий признак">
                     <i class="fa-solid fa-arrow-right"></i>
                 </a>
+
+                <div class="feed-params">
+                    <div class="feed-param feed-param-threshold">{{ .Sign.ThresholdText }}</div>
+                    {{ if .Sign.Stage }}
+                    <div class="feed-param feed-param-stage">{{ .Sign.Stage }}</div>
+                    {{ end }}
+                </div>
             </div>
         </div>
     </div>

@@ -6,6 +6,51 @@
     <title>Оценка тяжести панкреатита по Рэнсону</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/pancreatitis_styles.css">
+    <style>
+        /* форма: поиск сверху, фильтр под ним */
+        .search-form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+        .search-row, .filter-row { display: flex; gap: 10px; width: 100%; }
+
+        /* фильтр: число + ползунок, по ширине как поле поиска */
+        .filter-box {
+            flex: 1; min-width: 0; min-height: 44px;
+            display: flex; align-items: center; gap: 14px;
+            padding: 0 15px;
+            border: 1px solid #ccc; border-radius: 12px;
+            background-color: var(--white);
+        }
+        .filter-value {
+            min-width: 34px;
+            font-size: 15px; font-weight: 700;
+            color: var(--background-alternative);
+        }
+        .filter-slider {
+            -webkit-appearance: none; appearance: none;
+            --pct: 100%;
+            flex: 1; min-width: 0; height: 6px; margin: 0;
+            border-radius: 3px; outline: none; cursor: pointer;
+            background: linear-gradient(to right,
+                var(--background-alternative) 0%, var(--background-alternative) var(--pct),
+                rgba(8, 195, 220, 0.2) var(--pct), rgba(8, 195, 220, 0.2) 100%);
+        }
+        .filter-slider::-webkit-slider-runnable-track { height: 6px; background: transparent; }
+        .filter-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; margin-top: -7px; border-radius: 50%;
+            background-color: var(--background-alternative);
+            border: 2px solid var(--white);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+        .filter-slider::-moz-range-track { height: 6px; background: transparent; }
+        .filter-slider::-moz-range-thumb {
+            width: 16px; height: 16px; border-radius: 50%;
+            background-color: var(--background-alternative);
+            border: 2px solid var(--white);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,10 +62,23 @@
         </div>
 
         <form action="/pancreatitis-signs/grid" method="GET" class="search-form">
-            <input type="text" name="filter" class="search-bar" placeholder="Название критерия" value="{{ .Filter }}">
-            <button type="submit" class="submit-btn search-btn" aria-label="Поиск">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
+            <div class="search-row">
+                <input type="text" name="filter" class="search-bar" placeholder="Название критерия" value="{{ .Filter }}">
+                <button type="submit" class="submit-btn search-btn" aria-label="Поиск">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-box">
+                    <span class="filter-value" id="filter-value">{{ .SliderValue }}</span>
+                    <input type="range" name="max_value" id="filter-slider" class="filter-slider"
+                           min="0" max="{{ .SliderMax }}" step="1" value="{{ .SliderValue }}">
+                </div>
+                <button type="submit" class="submit-btn search-btn" aria-label="Применить фильтр">
+                    <i class="fa-solid fa-sliders"></i>
+                </button>
+            </div>
         </form>
 
         <div class="grid-container">
@@ -66,5 +124,19 @@
     </div>
 
 </div>
+
+<script>
+    (function () {
+        var slider = document.getElementById('filter-slider');
+        var label = document.getElementById('filter-value');
+        function update() {
+            var pct = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+            slider.style.setProperty('--pct', pct + '%');
+            label.textContent = slider.value;
+        }
+        slider.addEventListener('input', update);
+        update();
+    })();
+</script>
 </body>
 </html>
