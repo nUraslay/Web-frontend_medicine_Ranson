@@ -102,9 +102,6 @@ body {
     transition: 0.2s;
 }
 
-.action-btn:hover i { 
-    transform: scale(1.1); 
-}
 
 .like-btn i { 
     color: #ff3b30; 
