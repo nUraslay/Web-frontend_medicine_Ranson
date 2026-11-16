@@ -1,25 +1,21 @@
-import { Dispatch, FC, SetStateAction, useEffect, useState } from "react";
+import { FC } from "react";
+import { Spinner } from "react-bootstrap";
 import { Outlet } from "react-router-dom";
 import { PancreatitisBottomNav } from "./components/PancreatitisBottomNav";
-import { PancreatitisSign, getSigns } from "./modules/pancreatitisApi";
-
-export interface PancreatitisOutletContext {
-  signs: PancreatitisSign[];
-  setSigns: Dispatch<SetStateAction<PancreatitisSign[]>>;
-}
+import { useAppSelector } from "./store";
 
 export const PancreatitisAppLayout: FC = () => {
-
-  const [signs, setSigns] = useState<PancreatitisSign[]>([]);
-
-  useEffect(() => {
-    getSigns().then((all) => setSigns((current) => (current.length ? current : all)));
-  }, []);
+  const loading = useAppSelector((state) => state.pancreatitisSigns.loading);
 
   return (
     <div className="mobile-container">
-      <Outlet context={{ signs, setSigns } satisfies PancreatitisOutletContext} />
+      <Outlet />
       <PancreatitisBottomNav />
+      {loading && (
+        <div className="pancreatitis-loading-overlay">
+          <Spinner animation="border" />
+        </div>
+      )}
     </div>
   );
 };

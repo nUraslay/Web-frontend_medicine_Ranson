@@ -1,10 +1,9 @@
 import { FC, SyntheticEvent, useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap";
-import { useNavigate, useOutletContext, useParams } from "react-router-dom";
-import { PancreatitisOutletContext } from "../PancreatitisAppLayout";
+import { useNavigate, useParams } from "react-router-dom";
 import { DEFAULT_VIDEO, videoOrDefault } from "../modules/pancreatitisDefaults";
-import { PancreatitisSign, getSignById, getSigns } from "../modules/pancreatitisApi";
 import { ROUTES } from "../pancreatitisRoutes";
+import { getPancreatitisSignFeed, likePancreatitisSign } from "../slices/pancreatitisSignsSlice";
+import { useAppDispatch, useAppSelector } from "../store";
 
 const handleVideoError = (event: SyntheticEvent<HTMLVideoElement>) => {
   const video = event.currentTarget;
@@ -16,73 +15,53 @@ const handleVideoError = (event: SyntheticEvent<HTMLVideoElement>) => {
 const PancreatitisFeedPage: FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { signs } = useOutletContext<PancreatitisOutletContext>();
+  const dispatch = useAppDispatch();
+  const { feedSign: sign, loading } = useAppSelector((state) => state.pancreatitisSigns);
+  const isAuthenticated = useAppSelector((state) => state.pancreatitisUser.isAuthenticated);
   const signId = id ? Number(id) : undefined;
-
-  const fromList =
-    signId === undefined ? signs[0] : signs.find((item) => item.id === signId);
-
-  const [fetched, setFetched] = useState<PancreatitisSign | null | undefined>(undefined);
   const [expanded, setExpanded] = useState(false);
-  useEffect(() => {
-    if (fromList) return;
-
-    let cancelled = false;
-    setFetched(undefined);
-    const request =
-      signId === undefined
-        ? getSigns().then((list) => list[0])
-        : getSignById(signId);
-    request.then((result) => {
-      if (!cancelled) setFetched(result ?? null);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [signId, fromList]);
 
   useEffect(() => {
+    dispatch(getPancreatitisSignFeed({ id: signId }));
     setExpanded(false);
-  }, [signId]);
+  }, [dispatch, signId, isAuthenticated]);
 
-  const sign = fromList ?? fetched ?? undefined;
-  const notFound = !fromList && fetched === null;
-
-  const handleNext = () => {
-    if (!sign || !signs.length) return;
-    const index = signs.findIndex((item) => item.id === sign.id);
-    const next = signs[(index + 1) % signs.length];
-    navigate(`${ROUTES.FEED}/${next.id}`);
+  const handleNext = async () => {
+    if (!sign) return;
+    const result = await dispatch(getPancreatitisSignFeed({ id: sign.id, next: true }));
+    if (getPancreatitisSignFeed.fulfilled.match(result) && result.payload.sign) {
+      navigate(`${ROUTES.FEED}/${result.payload.sign.id}`);
+    }
   };
 
-  if (notFound) {
-    return (
-      <div id="feed-page" className="page active">
-        <div className="feed-overlay">
-          <div className="feed-info">
-            <div className="feed-title">Признак не найден</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleLike = () => {
+    if (!sign) return;
+    if (!isAuthenticated) {
+      navigate(ROUTES.LOGIN);
+      return;
+    }
+    dispatch(likePancreatitisSign({ id: sign.id, like: !sign.is_liked }));
+  };
 
   if (!sign) {
     return (
       <div id="feed-page" className="page active">
-        <div className="page-spinner">
-          <Spinner animation="border" />
-        </div>
+        {!loading && (
+          <div className="feed-overlay">
+            <div className="feed-info">
+              <div className="feed-title">Признак не найден</div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
   const videoSrc = videoOrDefault(sign.video_url);
+  const heartIcon = isAuthenticated && !sign.is_liked ? "fa-regular fa-heart" : "fa-solid fa-heart";
 
   return (
     <div id="feed-page" className="page active">
-
       <video
         key={`${sign.id}-${videoSrc}`}
         className="feed-video-bg"
@@ -109,14 +88,21 @@ const PancreatitisFeedPage: FC = () => {
         </div>
 
         <div className="feed-right-actions">
-          <div className="action-btn like-btn">
-            <i className="fa-solid fa-heart" />
+          <button
+            type="button"
+            className="action-btn like-btn"
+            aria-label="Лайк"
+            disabled={loading}
+            onClick={handleLike}
+          >
+            <i className={heartIcon} />
             <span id="feed-likes">{sign.likes_count}</span>
-          </div>
+          </button>
           <button
             type="button"
             className="feed-next-btn"
             aria-label="Следующий признак"
+            disabled={loading}
             onClick={handleNext}
           >
             <i className="fa-solid fa-arrow-right" />

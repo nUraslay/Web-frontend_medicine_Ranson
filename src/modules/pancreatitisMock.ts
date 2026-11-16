@@ -1,4 +1,4 @@
-import type { PancreatitisSign } from "./pancreatitisApi";
+import type { PancreatitisSign } from "./pancreatitisTypes";
 
 const AT_ADMISSION = "При поступлении";
 const AFTER_48H = "Через 48 часов";
@@ -141,3 +141,14 @@ export const PANCREATITIS_SIGNS_MOCK: PancreatitisSign[] = [
 export const MAX_THRESHOLD_MOCK = Math.max(
   ...PANCREATITIS_SIGNS_MOCK.map((sign) => sign.threshold_value)
 );
+
+export const filterPancreatitisSignsMock = (maxValue: number): PancreatitisSign[] =>
+  PANCREATITIS_SIGNS_MOCK.filter((sign) => sign.threshold_value <= maxValue);
+
+export const getPancreatitisFeedMock = (id?: number, next?: boolean): PancreatitisSign | null => {
+  const list = PANCREATITIS_SIGNS_MOCK;
+  if (id === undefined) return list[0] ?? null;
+  const index = list.findIndex((sign) => sign.id === id);
+  if (index === -1) return null;
+  return next ? list[(index + 1) % list.length] : list[index];
+};

@@ -1,47 +1,32 @@
-import { FC, useEffect, useState } from "react";
-import { Spinner } from "react-bootstrap";
-import { useNavigate, useOutletContext, useSearchParams } from "react-router-dom";
-import { PancreatitisOutletContext } from "../PancreatitisAppLayout";
+import { FC, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { PancreatitisSignCard } from "../components/PancreatitisSignCard";
 import { PancreatitisSignsFilter } from "../components/PancreatitisSignsFilter";
 import { MAX_THRESHOLD_MOCK } from "../modules/pancreatitisMock";
-import { PancreatitisSign, getSigns } from "../modules/pancreatitisApi";
 import { ROUTES } from "../pancreatitisRoutes";
+import {
+  deletePancreatitisSign,
+  getPancreatitisSignsList,
+  setPancreatitisMaxValue,
+} from "../slices/pancreatitisSignsSlice";
+import { useAppDispatch, useAppSelector } from "../store";
 
 const PancreatitisGridPage: FC = () => {
   const navigate = useNavigate();
-  const { setSigns } = useOutletContext<PancreatitisOutletContext>();
-
-  const [searchParams, setSearchParams] = useSearchParams();
-  const appliedMaxRaw = searchParams.get("max_value");
-  const appliedMax = appliedMaxRaw !== null ? Number(appliedMaxRaw) : MAX_THRESHOLD_MOCK;
-
-  const [maxValue, setMaxValue] = useState(appliedMax);
-  const [loading, setLoading] = useState(false);
-  const [cards, setCards] = useState<PancreatitisSign[]>([]);
+  const dispatch = useAppDispatch();
+  const { signs, maxValue, loading, error } = useAppSelector((state) => state.pancreatitisSigns);
+  const isAuthenticated = useAppSelector((state) => state.pancreatitisUser.isAuthenticated);
 
   useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-
-    getSigns({ maxValue: appliedMax }).then((result) => {
-      if (cancelled) return;
-      setCards(result);
-      setSigns(result);
-      setLoading(false);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [appliedMax, setSigns]);
+    dispatch(getPancreatitisSignsList());
+  }, [dispatch, isAuthenticated]);
 
   const handleSubmit = () => {
-    setSearchParams({ max_value: String(maxValue) });
+    dispatch(getPancreatitisSignsList());
   };
 
-  const handleCardClick = (id: number) => {
-    navigate(`${ROUTES.FEED}/${id}`);
+  const handleDelete = (id: number) => {
+    dispatch(deletePancreatitisSign(id));
   };
 
   return (
@@ -52,34 +37,31 @@ const PancreatitisGridPage: FC = () => {
 
       <PancreatitisSignsFilter
         maxValue={maxValue}
-        setMaxValue={setMaxValue}
+        setMaxValue={(value) => dispatch(setPancreatitisMaxValue(value))}
         sliderMax={MAX_THRESHOLD_MOCK}
         loading={loading}
         onSubmit={handleSubmit}
       />
 
-      {loading ? (
-        <div className="page-spinner">
-          <Spinner animation="border" />
-        </div>
-      ) : (
-        <div className="grid-container">
-          {cards.length ? (
-            cards.map((sign) => (
-              <PancreatitisSignCard
-                key={sign.id}
-                title={sign.title}
-                stage={sign.stage}
-                image_url={sign.image_url}
-                likes_count={sign.likes_count}
-                onClick={() => handleCardClick(sign.id)}
-              />
-            ))
-          ) : (
-            <p className="grid-empty">Ничего не найдено</p>
-          )}
-        </div>
-      )}
+      {error && <div className="form-error">{error}</div>}
+
+      <div className="grid-container">
+        {signs.length ? (
+          signs.map((sign) => (
+            <PancreatitisSignCard
+              key={sign.id}
+              title={sign.title}
+              stage={sign.stage}
+              image_url={sign.image_url}
+              likes_count={sign.likes_count}
+              onClick={() => navigate(`${ROUTES.FEED}/${sign.id}`)}
+              onDelete={isAuthenticated && sign.is_mine ? () => handleDelete(sign.id) : undefined}
+            />
+          ))
+        ) : (
+          !loading && <p className="grid-empty">Ничего не найдено</p>
+        )}
+      </div>
     </div>
   );
 };
